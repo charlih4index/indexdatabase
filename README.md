@@ -19,7 +19,7 @@ The more tagging will define more clarify the "object".
 
 Tagging to define the "object".
 
-images/tags.png
+![Tagging](images/tags.png)
 
 ---
 
@@ -29,7 +29,7 @@ For example, A=B(eq2), B=Tag#1, B=Tag#2...B=Tag#n, etc.
 
 B defines and describes A with more Tag#1...Tag #n for assistance.
 
-images/tagseq2.png
+![eq2](images/tagseq2.png)
 
 ```
 {
