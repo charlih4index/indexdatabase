@@ -17,30 +17,19 @@ The tag is just like to hashtag.
 
 The more tagging will define more clarify the "object".
 
-{numref}`fig-tagging` Tagging to define the "object".
+Tagging to define the "object".
 
-```{figure} images/tags.png
-:name: fig-tag
-:alt: Tagging
-
-Tagging.
-```
+images/tags.png
 
 ---
+
 Every object has a reciprocal relationship. 
 
 For example, A=B(eq2), B=Tag#1, B=Tag#2...B=Tag#n, etc. 
 
 B defines and describes A with more Tag#1...Tag #n for assistance.
 
-{numref}`fig-eq2` EQ2.
-
-```{figure} images/tagseq2.png
-:name: fig-eq2
-:alt: EQ2
-
-EQ2.
-```
+images/tagseq2.png
 
 ```
 {
