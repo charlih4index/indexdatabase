@@ -1,0 +1,9 @@
+[{
+   country code = "1",
+   area code = "626",
+   number = "1231234",
+   carrier = "T-Mobile",
+   owner = "Joe",
+   location = "LA, CA",
+   relatives - "user1"
+}]
