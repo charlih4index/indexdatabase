@@ -3,6 +3,7 @@
     "id": "1",
     "itemRated": "item1",
     "rating" : "5"
-    "RatedDate": "",
+    "RatedDate": "0000-00-00 00:00:00",
+    "RatedBy": "user"
   }
 ]
