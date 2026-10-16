@@ -14,10 +14,13 @@ Structured JSON databases migrated from indexbox/chinese/ placeholder .md files 
 
 ### O2O
 
+```
 {"name": "Alice"}
+```
 
 ### O2M
 
+```
 {
   "books": [
     {"title": "Devil may cry", "year": 2015, "author_id": 1},
@@ -29,3 +32,4 @@ Structured JSON databases migrated from indexbox/chinese/ placeholder .md files 
     {"author_id": 2, "author_name": "Stephen Ambrose"}
   ]
 }
+```
