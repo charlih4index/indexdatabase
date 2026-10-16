@@ -5,12 +5,12 @@ Structured JSON databases migrated from indexbox/chinese/ placeholder .md files 
 - `ChineseWord/chinese_word.json`: 10,850 Chinese single-character records (workspace for future definitions/zhuyin input).
 - `Zhuyin/zhuyin.json`: 1,331 zhuyin syllable records (parsed from ␢-symbol filenames; the .md workspace files remain in indexbox/chinese/).
 
-## Relationship among JSON files
+## JSON Relationship type
 
 | Type | Description |
 |------|-------------|
-| One-to-One | A single JSON is linked to another single JSON. |
-| One-to-Many | 	A single JSON can be linked to multiple JSONs. |
+| One-to-One | A single object is linked to another single object. |
+| One-to-Many | 	A single object can be linked to multiple objects. |
 
 ### O2O
 
@@ -33,3 +33,6 @@ Structured JSON databases migrated from indexbox/chinese/ placeholder .md files 
   ]
 }
 ```
+
+## Relationship among JSON files
+
