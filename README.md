@@ -38,3 +38,5 @@ Structured JSON databases migrated from indexbox/chinese/ placeholder .md files 
 
 ### M2M stands for Many-to-Many
 
+JSON Relationship Map: https://hashitosystem.com/en/tools/jsonmap/
+
