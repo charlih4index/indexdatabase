@@ -36,3 +36,5 @@ Structured JSON databases migrated from indexbox/chinese/ placeholder .md files 
 
 ## Relationship among JSON files
 
+### M2M stands for Many-to-Many
+
