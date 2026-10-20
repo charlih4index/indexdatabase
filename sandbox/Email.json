@@ -4,5 +4,11 @@
   "Username": "jdoe",
   "First name": "John",
   "Last name": "Doe"
+ },
+ {
+  "Email": "kengdic@import",
+  "Username": "kengdic-import",
+  "First name": "Kengdic",
+  "Last name": "Import"
  }
 ]
