@@ -54,6 +54,7 @@
     <div><label for="ft4">tag4</label><input type="text" id="ft4" placeholder="e.g. 字典"></div>
     <div><label for="ft5">tag5</label><input type="text" id="ft5" placeholder="e.g. noun"></div>
   </div>
+  <div class="msg" id="dupCheck" style="display:none"></div>
 
   <label for="fEmail">Your email</label>
   <input type="email" id="fEmail" placeholder="e.g. jdoe@email.com">
@@ -126,6 +127,7 @@ function findUser(email) { const e = String(email || '').trim().toLowerCase(); i
 function $(id) { return document.getElementById(id); }
 
 const recordsEl = $('records');
+const dupEl = $('dupCheck');
 const flash = document.createElement('div');
 flash.className = 'msg'; flash.id = 'recordsMsg';
 recordsEl.parentNode.insertBefore(flash, recordsEl);
@@ -152,6 +154,38 @@ function updateEmailUI() {
 }
 $('fEmail').addEventListener('input', updateEmailUI);
 $('fAnon').addEventListener('change', updateEmailUI);
+
+function updateDup() {
+  const a = $('fA').value.trim(), b = $('fB').value.trim();
+  if (!a && !b) { dupEl.style.display = 'none'; dupEl.innerHTML = ''; return; }
+  let html = '', isErr = false;
+  if (a && b) {
+    const pair = a + ' & ' + b, INFO = submissionInfo(), exact = [];
+    DB.A.forEach(function (rec, i) { if (abKey(rec) === pair) exact.push(i); });
+    if (exact.length) {
+      isErr = true;
+      html = 'Already submitted: "<b>' + esc(pair) + '</b>" (' + exact.length + 'x) — ' +
+        exact.map(function (i) { const s = INFO.subs[i]; return s ? 'by ' + esc(s.By) + ' on ' + esc(s['Submit date']) : ''; }).join('; ') +
+        '. You can rate the existing one below instead — or still submit yours as a competing entry.';
+    }
+  }
+  if (!html && a) {
+    const sameA = DB.A.filter(function (rec) { return rec.A === a; });
+    if (sameA.length) html = 'Note: "' + esc(a) + '" already has ' + sameA.length + (sameA.length === 1 ? ' entry' : ' entries') + ': ' +
+      sameA.map(function (rec) { return esc(rec['eq2(B)']); }).slice(0, 5).join(', ') + (sameA.length > 5 ? ', ...' : '') +
+      '. A different B is fine — one A can have several B meanings.';
+  }
+  if (!html && b) {
+    const sameB = DB.A.filter(function (rec) { return rec['eq2(B)'] === b; });
+    if (sameB.length) html = 'Note: "' + esc(b) + '" already appears as B in ' + sameB.length + (sameB.length === 1 ? ' entry' : ' entries') +
+      ' (' + sameB.map(function (rec) { return esc(rec.A); }).slice(0, 5).join(', ') + ').';
+  }
+  dupEl.className = 'msg ' + (isErr ? 'err' : 'ok');
+  dupEl.innerHTML = html;
+  dupEl.style.display = html ? 'block' : 'none';
+}
+$('fA').addEventListener('input', updateDup);
+$('fB').addEventListener('input', updateDup);
 
 $('submitBtn').addEventListener('click', function () {
   const A = $('fA').value.trim(), B = $('fB').value.trim();
@@ -257,7 +291,7 @@ $('resetBtn').addEventListener('click', function () {
   renderAll(); updateEmailUI();
   showMsg($('submitMsg'), 'Prototype data reset to the seed data from the repo JSON files.', true);
 });
-function renderAll() { renderRecords(); renderUsers(); renderData(); }
+function renderAll() { renderRecords(); renderUsers(); renderData(); updateDup(); }
 updateEmailUI();
 renderAll();
 </script>
