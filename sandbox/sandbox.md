@@ -33,3 +33,11 @@ exports:
 | 5 | 2370 | 2370 | 2370未来人 |   | | | 2024 |
 | 6 | 2582 | 2582 | 2582未来人 |   | | | 2024 |
 
+## AB database
+
+| A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
+|---|--------|------|------|------|------|------|
+| Chinese | 中文 | English to Chinese | 英中翻譯 | dictionary | 字典 | noun |
+
+| Email | Username | Frist name | Last name | | | |
+|-------|----------|------------|-----------|-|-|-|
