@@ -71,5 +71,6 @@ JSON#2 rates the JSON#1. If rate is -1, JSON#2 will write the correcting note on
 
 ### A=B files relationship
 
-<img width="1506" height="521" alt="image" src="https://github.com/user-attachments/assets/b0ec2ec3-5484-4f82-86c6-be832b7bf65f" />
+<img width="1506" height="521" alt="image" src="https://github.com/user-attachments/assets/0fcb9712-56de-471e-bb27-3410ec7f943d" />
+
 
