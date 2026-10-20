@@ -88,9 +88,9 @@ const SEED = {
   "A": [{"A": "Chinese", "eq2(B)": "中文", "tag1": "English to Chinese", "tag2": "英中翻譯", "tag3": "dictionary", "tag4": "字典", "tag5": "noun"}],
   "Email": [{"Email": "jdoe@email.com", "Username": "jdoe", "First name": "John", "Last name": "Doe"}],
   "SubmitDate": [{"Submit date": "2026-10-20", "By": "jdoe@email.com", "AB": "Chinese & 中文"}],
-  "Rating": [{"Rating": -1, "AB": "Chinese & 中文", "By": "jroe@mail.net", "Note for the AB": "A is not equal to B, please correct it. Thank you."}]
+  "Rating": [{"Rating": -1, "AB": "Chinese & 中文 & jdoe@email.com & 2026-10-20", "By": "jroe@mail.net", "Note for the AB": "A is not equal to B, please correct it. Thank you."}]
 };
-const LS_KEY = 'abdb_proto_v1';
+const LS_KEY = 'abdb_proto_v2';
 const FILES = [["A", "A.json"], ["Email", "Email.json"], ["SubmitDate", "SubmitDate.json"], ["Rating", "Rating.json"]];
 let DB = load();
 
@@ -107,6 +107,20 @@ function load() {
 function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(DB)); } catch (e) {} }
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
 function abKey(rec) { return rec.A + ' & ' + rec['eq2(B)']; }
+function submissionInfo() {
+  const pairSeen = {}, keyUsed = {}, subs = [], keys = [];
+  DB.A.forEach(function (rec) {
+    const pair = abKey(rec);
+    const n = (pairSeen[pair] = (pairSeen[pair] || 0) + 1);
+    const matches = DB.SubmitDate.filter(function (s) { return s.AB === pair; });
+    const sub = matches[n - 1] || null;
+    subs.push(sub);
+    let k = sub ? pair + ' & ' + sub.By + ' & ' + sub['Submit date'] : pair + ' & (no submission record)';
+    if (keyUsed[k]) { keyUsed[k]++; k = k + ' & #' + keyUsed[k]; } else { keyUsed[k] = 1; }
+    keys.push(k);
+  });
+  return {subs: subs, keys: keys};
+}
 function todayStr() { const d = new Date(); const p = function (n) { return String(n).padStart(2, '0'); }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
 function findUser(email) { const e = String(email || '').trim().toLowerCase(); if (!e) return null; return DB.Email.find(function (u) { return String(u.Email).toLowerCase() === e; }) || null; }
 function $(id) { return document.getElementById(id); }
@@ -167,13 +181,14 @@ $('submitBtn').addEventListener('click', function () {
 function rateClass(r) { return r < 0 ? 'rneg' : (r > 0 ? 'rpos' : 'rzero'); }
 function renderRecords() {
   if (!DB.A.length) { recordsEl.innerHTML = '<p class="meta">No AB records yet.</p>'; return; }
+  const INFO = submissionInfo();
   recordsEl.innerHTML = DB.A.map(function (rec, i) {
-    const key = abKey(rec);
-    const subs = DB.SubmitDate.filter(function (s) { return s.AB === key; });
+    const key = INFO.keys[i];
+    const sub = INFO.subs[i];
     const rats = DB.Rating.filter(function (r) { return r.AB === key; });
     const score = rats.reduce(function (a, r) { return a + Number(r.Rating || 0); }, 0);
     const tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'].map(function (t) { return rec[t]; }).filter(Boolean).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('');
-    const subHtml = subs.map(function (s) { return '<div class="meta">Submitted by ' + esc(s.By) + ' on ' + esc(s['Submit date']) + '</div>'; }).join('');
+    const subHtml = sub ? '<div class="meta">Submitted by ' + esc(sub.By) + ' on ' + esc(sub['Submit date']) + '</div><div class="meta">Submission key: ' + esc(key) + '</div>' : '<div class="meta">No submission record for this AB.</div>';
     const ratHtml = rats.length ? rats.map(function (r) {
       return '<div class="ratingline"><span class="rate ' + rateClass(Number(r.Rating)) + '">' + esc(r.Rating) + '</span>by ' + esc(r.By) + (r['Note for the AB'] ? ' — ' + esc(r['Note for the AB']) : '') + '</div>';
     }).join('') : '<div class="ratingline meta">No ratings yet.</div>';
@@ -207,9 +222,9 @@ recordsEl.addEventListener('click', function (e) {
   let by = card.querySelector('.rateEmail').value.trim();
   if (!by) by = 'anonymous';
   if (rating === -1 && !note) { showRecordsMsg('Rating −1 (Wrong) needs a correcting note in "Note for the AB".', false); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
-  DB.Rating.push({"Rating": rating, "AB": abKey(rec), "By": by, "Note for the AB": note});
+  DB.Rating.push({"Rating": rating, "AB": submissionInfo().keys[i], "By": by, "Note for the AB": note});
   save(); renderAll();
-  showRecordsMsg('Saved (simulated): rating ' + rating + ' for "' + abKey(rec) + '" added to Rating.json (By = ' + by + ').', true);
+  showRecordsMsg('Saved (simulated): rating ' + rating + ' for submission "' + submissionInfo().keys[i] + '" added to Rating.json (By = ' + by + ').', true);
 });
 
 /* ---------- users & data panel ---------- */
