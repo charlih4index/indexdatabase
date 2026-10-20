@@ -22,7 +22,7 @@ exports:
 
 ## test1
 
-## Future man AKA. 未来人
+## Future people AKA. 未来人
 
 | No | Name | Year From | Alternative name | Soical media | Account name | Country |
 |----|-----|------------|-----------------|--------------|--------------|--------|
