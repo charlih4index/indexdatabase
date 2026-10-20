@@ -26,7 +26,7 @@ exports:
 
 | No | Name | Year From | Alternative name | Soical media | Account name | Country | Appeared in |
 |----|-----|------------|-----------------|--------------|--------------|--------|-------------|
-| 1 | 國分玲 | 2058 | 2058未来人 | Twitter or SNS | bV6eBJOQc7bUvgO | Japan | 2019-2020 |
+| 1 | 國分玲 (Rina Kunitsuki) | 2058 | 2058未来人 | Twitter or SNS | bV6eBJOQc7bUvgO | Japan | 2019-2020 |
 | 2 | KFK | 2048 | 2048未来人 |  | | Japan | |
 | 3 | 2062 | Yomino Yuna | 2062未来人 | 2ch (日本論壇) |  | Japan | 2012 |
 | 4 | John Titor | 2036 | 2036未来人  |  | | | 2000 |
