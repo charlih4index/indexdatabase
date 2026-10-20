@@ -52,7 +52,7 @@ exports:
 
 JSON#2 submits the JSON#1 on JSON#3
 
-### JSON#4 (Rating scale: -1, 0, 1 Aka Wrong, No comment, Correct)
+### JSON#4 (Rating scale: -1, 0, 1 AKA Wrong, No comment, Correct)
 
 | Rating | AB | By | Note for the AB | | | |
 |-------|----------|------------|-----------|-|-|-|
