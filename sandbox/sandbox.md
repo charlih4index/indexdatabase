@@ -73,3 +73,5 @@ JSON#2 rates the JSON#1. If rate is -1, JSON#2 will write the correcting note on
 
 <img width="1506" height="537" alt="image" src="https://github.com/user-attachments/assets/e3e688f2-53b8-4d9d-bcd0-1d9e7416e204" />
 
+A.json 檔案設計為初始為空，並由使用者群體共同建構－全球最終使用者都是導入來源。
+
