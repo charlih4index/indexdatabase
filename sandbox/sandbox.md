@@ -33,7 +33,7 @@ exports:
 | 5 | 2370 | 2370 | 2370未来人 |   | | | 2024 |
 | 6 | 2582 | 2582 | 2582未来人 |   | | | 2024 |
 
-## AB database
+## AB database (AB.json)
 
 ### JSON#1
 | A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
