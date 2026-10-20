@@ -50,4 +50,12 @@ exports:
 |-------|----------|------------|-----------|-|-|-|
 | A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
 
+JSON#2 submits the JSON#1 on JSON#3
 
+### JSON#4 (Rating scale: -1, 0, 1 Aka Wrong, No comment, Correct)
+
+| Rating | AB | By | Note for the AB | | | |
+|-------|----------|------------|-----------|-|-|-|
+| A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
+
+JSON#2 rates the JSON#1. If rate is -1, JSON#2 will write the correcting note on the "Note for the AB".
