@@ -44,6 +44,7 @@ exports:
 | Email | Username | Frist name | Last name | | | |
 |-------|----------|------------|-----------|-|-|-|
 | A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
+| jdoe@email.com | jdoe | John | Doe | | | |
 
 ### JSON#3
 | Submit date | By | AB |  | | | |
