@@ -64,3 +64,8 @@ JSON#2 submits the JSON#1 on JSON#3
 | -1 or 0 or 1 |  **Chinese** & **中文** |  jroe@mail.net | A is not equal to B, please correct it. Thank you. | | | |
 
 JSON#2 rates the JSON#1. If rate is -1, JSON#2 will write the correcting note on the "Note for the AB".
+
+### Diagram of the AB databse
+
+<img width="1256" height="781" alt="image" src="https://github.com/user-attachments/assets/047220a7-38a6-4770-847b-81cda6467278" />
+
