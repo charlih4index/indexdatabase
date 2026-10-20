@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AB Database — Prototype</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; margin: 0; background: #f6f7f9; color: #1c2330; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { font-size: 26px; margin: 8px 0 4px; }
+  h2 { font-size: 19px; margin: 28px 0 10px; border-bottom: 2px solid #d8dde6; padding-bottom: 4px; }
+  .badge { display: inline-block; background: #b45309; color: #fff; border-radius: 4px; padding: 2px 8px; font-size: 12.5px; font-weight: 600; vertical-align: middle; }
+  .note { background: #fff7e6; border: 1px solid #f0d48a; border-radius: 6px; padding: 10px 12px; font-size: 14px; }
+  .card { background: #fff; border: 1px solid #d8dde6; border-radius: 8px; padding: 14px 16px; margin: 12px 0; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 10px 0 3px; color: #39445c; }
+  input[type=text], input[type=email] { width: 100%; box-sizing: border-box; padding: 8px 9px; border: 1px solid #b9c2d0; border-radius: 5px; font-size: 15px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  button { background: #1663c7; color: #fff; border: 0; border-radius: 6px; padding: 9px 18px; font-size: 15px; cursor: pointer; margin-top: 14px; }
+  button:hover { background: #0f4f9f; }
+  button.small { padding: 5px 12px; font-size: 13.5px; margin-top: 8px; }
+  button.gray { background: #5b6577; }
+  .msg { margin-top: 12px; font-size: 14.5px; display: none; }
+  .msg.ok { color: #137333; } .msg.err { color: #b3261e; }
+  .ab { font-size: 18px; font-weight: 700; }
+  .tags { color: #39445c; font-size: 14px; margin-top: 3px; }
+  .tags span { background: #eef1f6; border-radius: 10px; padding: 1px 9px; margin-right: 5px; white-space: nowrap; display: inline-block; margin-top: 3px; }
+  .meta { color: #5b6577; font-size: 13.5px; margin-top: 6px; }
+  .rate { display: inline-block; min-width: 26px; text-align: center; border-radius: 4px; color: #fff; font-weight: 700; padding: 1px 0; margin-right: 7px; }
+  .rneg { background: #b3261e; } .rzero { background: #80868b; } .rpos { background: #137333; }
+  .ratingline { font-size: 14px; margin: 5px 0 5px 10px; }
+  .score { font-weight: 700; }
+  .rateform { border-top: 1px dashed #d8dde6; margin-top: 10px; padding-top: 4px; }
+  .radios label { display: inline-block; font-weight: 400; margin: 6px 14px 0 0; font-size: 14.5px; }
+  pre { background: #111827; color: #d1e7ff; border-radius: 6px; padding: 10px 12px; overflow-x: auto; font-size: 13px; max-height: 300px; overflow-y: auto; }
+  details { margin: 10px 0; } summary { cursor: pointer; font-weight: 600; font-size: 15px; }
+  table.users { border-collapse: collapse; font-size: 14px; } table.users td, table.users th { border: 1px solid #d8dde6; padding: 4px 10px; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>AB Database <span class="badge">PROTOTYPE</span></h1>
+<p class="note">This prototype follows the AB database concept in <b>indexdatabase / sandbox / sandbox.md</b>. Saving is <b>simulated in this browser only</b> (localStorage) — nothing is written to GitHub yet. The starting data is the seed data in the repo files <b>A.json</b>, <b>Email.json</b>, <b>SubmitDate.json</b> and <b>Rating.json</b>. Use “Reset to seed data” at the bottom to start over.</p>
+
+<h2>1. Submit an AB record</h2>
+<div class="card">
+  <div class="grid">
+    <div><label for="fA">A</label><input type="text" id="fA" placeholder="e.g. Chinese"></div>
+    <div><label for="fB">eq2(B) — B, equal to A</label><input type="text" id="fB" placeholder="e.g. 中文"></div>
+    <div><label for="ft1">tag1</label><input type="text" id="ft1" placeholder="e.g. English to Chinese"></div>
+    <div><label for="ft2">tag2</label><input type="text" id="ft2" placeholder="e.g. 英中翻譯"></div>
+    <div><label for="ft3">tag3</label><input type="text" id="ft3" placeholder="e.g. dictionary"></div>
+    <div><label for="ft4">tag4</label><input type="text" id="ft4" placeholder="e.g. 字典"></div>
+    <div><label for="ft5">tag5</label><input type="text" id="ft5" placeholder="e.g. noun"></div>
+  </div>
+
+  <label for="fEmail">Your email</label>
+  <input type="email" id="fEmail" placeholder="e.g. jdoe@email.com">
+  <div class="meta" id="emailStatus"></div>
+
+  <div id="registerBox" class="hidden">
+    <div class="grid">
+      <div><label for="fUser">Username (register)</label><input type="text" id="fUser" placeholder="e.g. jdoe"></div>
+      <div><label for="fFirst">First name</label><input type="text" id="fFirst" placeholder="e.g. John"></div>
+      <div><label for="fLast">Last name</label><input type="text" id="fLast" placeholder="e.g. Doe"></div>
+    </div>
+  </div>
+
+  <label style="font-weight:400"><input type="checkbox" id="fAnon"> Submit as anonymous (no email recorded)</label>
+  <br>
+  <button id="submitBtn" type="button">Submit AB record</button>
+  <div class="msg" id="submitMsg"></div>
+</div>
+
+<h2>2. Records &amp; ratings</h2>
+<div id="records"></div>
+
+<h2>3. Registered users (Email.json)</h2>
+<div id="users"></div>
+
+<h2>4. The four JSON files (current simulated state)</h2>
+<div id="dataPanel"></div>
+<button class="gray" id="resetBtn" type="button">Reset to seed data</button>
+</div>
+<script>
+const SEED = {
+  "A": [{"A": "Chinese", "eq2(B)": "中文", "tag1": "English to Chinese", "tag2": "英中翻譯", "tag3": "dictionary", "tag4": "字典", "tag5": "noun"}],
+  "Email": [{"Email": "jdoe@email.com", "Username": "jdoe", "First name": "John", "Last name": "Doe"}],
+  "SubmitDate": [{"Submit date": "2026-10-20", "By": "jdoe@email.com", "AB": "Chinese & 中文"}],
+  "Rating": [{"Rating": -1, "AB": "Chinese & 中文", "By": "jroe@mail.net", "Note for the AB": "A is not equal to B, please correct it. Thank you."}]
+};
+const LS_KEY = 'abdb_proto_v1';
+const FILES = [["A", "A.json"], ["Email", "Email.json"], ["SubmitDate", "SubmitDate.json"], ["Rating", "Rating.json"]];
+let DB = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d && Array.isArray(d.A) && Array.isArray(d.Email) && Array.isArray(d.SubmitDate) && Array.isArray(d.Rating)) return d;
+    }
+  } catch (e) {}
+  return JSON.parse(JSON.stringify(SEED));
+}
+function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(DB)); } catch (e) {} }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); }
+function abKey(rec) { return rec.A + ' & ' + rec['eq2(B)']; }
+function todayStr() { const d = new Date(); const p = function (n) { return String(n).padStart(2, '0'); }; return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+function findUser(email) { const e = String(email || '').trim().toLowerCase(); if (!e) return null; return DB.Email.find(function (u) { return String(u.Email).toLowerCase() === e; }) || null; }
+function $(id) { return document.getElementById(id); }
+
+const recordsEl = $('records');
+const flash = document.createElement('div');
+flash.className = 'msg'; flash.id = 'recordsMsg';
+recordsEl.parentNode.insertBefore(flash, recordsEl);
+
+function showMsg(el, text, ok) { el.textContent = text; el.className = 'msg ' + (ok ? 'ok' : 'err'); el.style.display = 'block'; }
+function showRecordsMsg(text, ok) { showMsg(flash, text, ok); }
+
+/* ---------- submit form ---------- */
+function updateEmailUI() {
+  const anon = $('fAnon').checked;
+  const email = $('fEmail').value;
+  $('fEmail').disabled = anon;
+  ['fUser', 'fFirst', 'fLast'].forEach(function (id) { $(id).disabled = anon; });
+  if (anon) { $('registerBox').classList.add('hidden'); $('emailStatus').textContent = 'Anonymous: the record will be filed with By = anonymous.'; return; }
+  if (!email.trim()) { $('registerBox').classList.add('hidden'); $('emailStatus').textContent = 'Enter your email, or check "Submit as anonymous".'; return; }
+  const u = findUser(email);
+  if (u) {
+    $('registerBox').classList.add('hidden');
+    $('emailStatus').textContent = 'Registered as ' + u.Username + ' (' + u['First name'] + ' ' + u['Last name'] + ') — no need to register again.';
+  } else {
+    $('registerBox').classList.remove('hidden');
+    $('emailStatus').textContent = 'New email — register below, or check "Submit as anonymous" instead.';
+  }
+}
+$('fEmail').addEventListener('input', updateEmailUI);
+$('fAnon').addEventListener('change', updateEmailUI);
+
+$('submitBtn').addEventListener('click', function () {
+  const A = $('fA').value.trim(), B = $('fB').value.trim();
+  if (!A || !B) { showMsg($('submitMsg'), 'A and eq2(B) are required.', false); return; }
+  const rec = {"A": A, "eq2(B)": B, "tag1": $('ft1').value.trim(), "tag2": $('ft2').value.trim(), "tag3": $('ft3').value.trim(), "tag4": $('ft4').value.trim(), "tag5": $('ft5').value.trim()};
+  let by = 'anonymous', registered = false;
+  if (!$('fAnon').checked) {
+    const email = $('fEmail').value.trim();
+    if (!email || email.indexOf('@') < 0) { showMsg($('submitMsg'), 'A valid email is required, or check "Submit as anonymous".', false); return; }
+    by = email;
+    if (!findUser(email)) {
+      const un = $('fUser').value.trim(), fn = $('fFirst').value.trim(), ln = $('fLast').value.trim();
+      if (!un || !fn || !ln) { showMsg($('submitMsg'), 'New email: fill in Username, First name and Last name to register, or submit as anonymous.', false); return; }
+      DB.Email.push({"Email": email, "Username": un, "First name": fn, "Last name": ln});
+      registered = true;
+    }
+  }
+  DB.A.push(rec);
+  DB.SubmitDate.push({"Submit date": todayStr(), "By": by, "AB": abKey(rec)});
+  save(); renderAll();
+  ['fA', 'fB', 'ft1', 'ft2', 'ft3', 'ft4', 'ft5'].forEach(function (id) { $(id).value = ''; });
+  updateEmailUI();
+  showMsg($('submitMsg'), 'Saved (simulated): "' + abKey(rec) + '" added to A.json and SubmitDate.json' + (registered ? ', and ' + by + ' registered in Email.json' : '') + ' (By = ' + by + ').', true);
+});
+
+/* ---------- records & ratings ---------- */
+function rateClass(r) { return r < 0 ? 'rneg' : (r > 0 ? 'rpos' : 'rzero'); }
+function renderRecords() {
+  if (!DB.A.length) { recordsEl.innerHTML = '<p class="meta">No AB records yet.</p>'; return; }
+  recordsEl.innerHTML = DB.A.map(function (rec, i) {
+    const key = abKey(rec);
+    const subs = DB.SubmitDate.filter(function (s) { return s.AB === key; });
+    const rats = DB.Rating.filter(function (r) { return r.AB === key; });
+    const score = rats.reduce(function (a, r) { return a + Number(r.Rating || 0); }, 0);
+    const tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'].map(function (t) { return rec[t]; }).filter(Boolean).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('');
+    const subHtml = subs.map(function (s) { return '<div class="meta">Submitted by ' + esc(s.By) + ' on ' + esc(s['Submit date']) + '</div>'; }).join('');
+    const ratHtml = rats.length ? rats.map(function (r) {
+      return '<div class="ratingline"><span class="rate ' + rateClass(Number(r.Rating)) + '">' + esc(r.Rating) + '</span>by ' + esc(r.By) + (r['Note for the AB'] ? ' — ' + esc(r['Note for the AB']) : '') + '</div>';
+    }).join('') : '<div class="ratingline meta">No ratings yet.</div>';
+    return '<div class="card">'
+      + '<div class="ab">' + esc(rec.A) + ' = ' + esc(rec['eq2(B)']) + '</div>'
+      + (tags ? '<div class="tags">' + tags + '</div>' : '')
+      + subHtml
+      + '<div class="meta"><span class="score">Score: ' + (score > 0 ? '+' : '') + score + '</span> from ' + rats.length + ' rating' + (rats.length === 1 ? '' : 's') + ' (Rating.json)</div>'
+      + ratHtml
+      + '<div class="rateform">'
+      + '<label>Your email (leave empty = anonymous)</label><input type="text" class="rateEmail" placeholder="e.g. jroe@mail.net">'
+      + '<div class="radios">'
+      + '<label><input type="radio" name="rating_' + i + '" value="-1"> −1 Wrong</label>'
+      + '<label><input type="radio" name="rating_' + i + '" value="0" checked> 0 No comment</label>'
+      + '<label><input type="radio" name="rating_' + i + '" value="1"> +1 Correct</label>'
+      + '</div>'
+      + '<label>Note for the AB (required for −1)</label><input type="text" class="rateNote" placeholder="e.g. A is not equal to B, please correct it. Thank you.">'
+      + '<br><button type="button" class="small rateBtn" data-idx="' + i + '">Rate this AB</button>'
+      + '</div></div>';
+  }).join('');
+}
+recordsEl.addEventListener('click', function (e) {
+  const btn = e.target.closest('.rateBtn');
+  if (!btn) return;
+  const i = Number(btn.getAttribute('data-idx'));
+  const rec = DB.A[i]; if (!rec) return;
+  const card = btn.closest('.card');
+  const sel = card.querySelector('input[name="rating_' + i + '"]:checked');
+  const rating = sel ? Number(sel.value) : 0;
+  const note = card.querySelector('.rateNote').value.trim();
+  let by = card.querySelector('.rateEmail').value.trim();
+  if (!by) by = 'anonymous';
+  if (rating === -1 && !note) { showRecordsMsg('Rating −1 (Wrong) needs a correcting note in "Note for the AB".', false); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+  DB.Rating.push({"Rating": rating, "AB": abKey(rec), "By": by, "Note for the AB": note});
+  save(); renderAll();
+  showRecordsMsg('Saved (simulated): rating ' + rating + ' for "' + abKey(rec) + '" added to Rating.json (By = ' + by + ').', true);
+});
+
+/* ---------- users & data panel ---------- */
+function renderUsers() {
+  if (!DB.Email.length) { $('users').innerHTML = '<p class="meta">No registered users yet.</p>'; return; }
+  $('users').innerHTML = '<table class="users"><tr><th>Email</th><th>Username</th><th>First name</th><th>Last name</th></tr>'
+    + DB.Email.map(function (u) { return '<tr><td>' + esc(u.Email) + '</td><td>' + esc(u.Username) + '</td><td>' + esc(u['First name']) + '</td><td>' + esc(u['Last name']) + '</td></tr>'; }).join('') + '</table>';
+}
+function renderData() {
+  $('dataPanel').innerHTML = FILES.map(function (pair) {
+    const key = pair[0], name = pair[1];
+    return '<details><summary>' + name + ' (' + DB[key].length + ' record' + (DB[key].length === 1 ? '' : 's') + ')</summary>'
+      + '<pre>' + esc(JSON.stringify(DB[key], null, 1)) + '</pre>'
+      + '<button type="button" class="small gray dlBtn" data-key="' + key + '" data-name="' + name + '">Download ' + name + '</button></details>';
+  }).join('');
+}
+$('dataPanel').addEventListener('click', function (e) {
+  const btn = e.target.closest('.dlBtn');
+  if (!btn) return;
+  const blob = new Blob([JSON.stringify(DB[btn.getAttribute('data-key')], null, 1) + '\n'], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = btn.getAttribute('data-name');
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+});
+$('resetBtn').addEventListener('click', function () {
+  try { localStorage.removeItem(LS_KEY); } catch (e) {}
+  DB = JSON.parse(JSON.stringify(SEED));
+  renderAll(); updateEmailUI();
+  showMsg($('submitMsg'), 'Prototype data reset to the seed data from the repo JSON files.', true);
+});
+function renderAll() { renderRecords(); renderUsers(); renderData(); }
+updateEmailUI();
+renderAll();
+</script>
+</body>
+</html>
