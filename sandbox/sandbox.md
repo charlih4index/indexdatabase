@@ -21,3 +21,8 @@ exports:
 # Sandbox
 
 ## test1
+
+## Future man AKA. 未来人
+
+| No | Name | Year From | Alternative name | Soical media | Account name | 
+| 1 | 國分玲 | 2058 | 2058未来人 | Twitter | bV6eBJOQc7bUvgO |
