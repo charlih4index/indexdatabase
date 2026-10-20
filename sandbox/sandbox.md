@@ -50,6 +50,7 @@ exports:
 | Submit date | By | AB |  | | | |
 |-------|----------|------------|-----------|-|-|-|
 | A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
+| ThatDay() | jdoe@email.com | **Chinese** & **中文** | | | | |
 
 JSON#2 submits the JSON#1 on JSON#3
 
@@ -58,5 +59,6 @@ JSON#2 submits the JSON#1 on JSON#3
 | Rating | AB | By | Note for the AB | | | |
 |-------|----------|------------|-----------|-|-|-|
 | A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
+| -1 or 0 or 1 |  **Chinese** & **中文** |  jroe@mail.net | A is not equal to B, please correct it. Thank you. | | | |
 
 JSON#2 rates the JSON#1. If rate is -1, JSON#2 will write the correcting note on the "Note for the AB".
