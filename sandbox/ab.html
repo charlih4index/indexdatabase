@@ -43,7 +43,7 @@
 <h1>AB Database <span class="badge">PROTOTYPE</span></h1>
 <p class="note">This prototype follows the AB database concept in <b>indexdatabase / sandbox / sandbox.md</b>. Saving is <b>simulated in this browser only</b> (localStorage) — nothing is written to GitHub yet. The starting data is the seed data in the repo files <b>A.json</b>, <b>Email.json</b>, <b>SubmitDate.json</b> and <b>Rating.json</b>. Use “Reset to seed data” at the bottom to start over.</p>
 
-<h2>1. Submit an AB record</h2>
+<h2>1. Submit an A=B record</h2>
 <div class="card">
   <div class="grid">
     <div><label for="fA">A</label><input type="text" id="fA" placeholder="e.g. Chinese"></div>
@@ -69,7 +69,7 @@
 
   <label style="font-weight:400"><input type="checkbox" id="fAnon"> Submit as anonymous (no email recorded)</label>
   <br>
-  <button id="submitBtn" type="button">Submit AB record</button>
+  <button id="submitBtn" type="button">Submit A=B record</button>
   <div class="msg" id="submitMsg"></div>
 </div>
 
@@ -191,7 +191,7 @@ function renderRecords() {
       + '<label><input type="radio" name="rating_' + i + '" value="1"> +1 Correct</label>'
       + '</div>'
       + '<label>Note for the AB (required for −1)</label><input type="text" class="rateNote" placeholder="e.g. A is not equal to B, please correct it. Thank you.">'
-      + '<br><button type="button" class="small rateBtn" data-idx="' + i + '">Rate this AB</button>'
+      + '<br><button type="button" class="small rateBtn" data-idx="' + i + '">Rate this A=B</button>'
       + '</div></div>';
   }).join('');
 }
