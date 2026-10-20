@@ -35,18 +35,18 @@ exports:
 
 ## AB database (AB.json)
 
-### JSON#1
+### JSON#1 (A.json)
 | A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
 |---|--------|------|------|------|------|------|
 | Chinese | 中文 | English to Chinese | 英中翻譯 | dictionary | 字典 | noun |
 
-### JSON#2
+### JSON#2 (Email.json)
 | Email | Username | Frist name | Last name | | | |
 |-------|----------|------------|-----------|-|-|-|
 | A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
 | jdoe@email.com | jdoe | John | Doe | | | |
 
-### JSON#3
+### JSON#3 (SubmitDate.json)
 | Submit date | By | AB |  | | | |
 |-------|----------|------------|-----------|-|-|-|
 | A | eq2(B) | tag1 | tag2 | tag3 | tag4 | tag5 |
@@ -54,7 +54,9 @@ exports:
 
 JSON#2 submits the JSON#1 on JSON#3
 
-### JSON#4 (Rating scale: -1, 0, 1 AKA Wrong(-1), No comment(0), Correct(1))
+### JSON#4 (Rating.json)
+
+(Rating scale: -1, 0, 1 AKA Wrong(-1), No comment(0), Correct(1))
 
 | Rating | AB | By | Note for the AB | | | |
 |-------|----------|------------|-----------|-|-|-|
