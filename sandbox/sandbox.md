@@ -71,6 +71,10 @@ JSON#2 rates the JSON#1. If rate is -1, JSON#2 will write the correcting note on
 
 ### A=B files relationship
 
+<img width="1506" height="537" alt="image" src="https://github.com/user-attachments/assets/e3e688f2-53b8-4d9d-bcd0-1d9e7416e204" />
+
+A.json 檔案設計為初始為空，並由使用者群體共同建構－全球最終使用者都是導入來源。
+
 ## Free tier SQL DB host service
 
 | Service         | Database Engine              | Free Storage                   | Key Limit           | Always-On            | Best For                                                              |
@@ -80,9 +84,3 @@ JSON#2 rates the JSON#1. If rate is -1, JSON#2 will write the correcting note on
 | **Turso**       | libSQL (SQLite)              | 9 GB                           | 1B row reads/mo     | Yes                  | Read-heavy, globally distributed apps needing low latency             |
 | **CockroachDB** | PostgreSQL (wire-compatible) | 10 GiB                         | 50M Request Units   | Scales to zero       | Apps that need enterprise-grade resilience and horizontal scale       |
 | **TiDB Cloud**  | MySQL (compatible)           | 5 GiB (row) + 5 GiB (columnar) | 50M RUs, 5 clusters | Yes                  | Data-intensive apps needing real-time analytics on transactional data |
-
-
-<img width="1506" height="537" alt="image" src="https://github.com/user-attachments/assets/e3e688f2-53b8-4d9d-bcd0-1d9e7416e204" />
-
-A.json 檔案設計為初始為空，並由使用者群體共同建構－全球最終使用者都是導入來源。
-
