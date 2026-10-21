@@ -489,6 +489,13 @@ renderUsers();
 renderData();
 updateEmailUI();
 
+/* Arriving from a "Contribute A=B" button on a dictionary page: prefill A and run the check. */
+const urlA = new URLSearchParams(window.location.search).get('a');
+if (urlA) {
+  $('fA').value = urlA;
+  refreshPreview().then(function () { scrollToEl($('previewBox')); });
+}
+
 </script>
 </body>
 </html>
