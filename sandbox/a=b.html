@@ -35,13 +35,18 @@
   pre { background: #111827; color: #d1e7ff; border-radius: 6px; padding: 10px 12px; overflow-x: auto; font-size: 13px; max-height: 300px; overflow-y: auto; }
   details { margin: 10px 0; } summary { cursor: pointer; font-weight: 600; font-size: 15px; }
   table.users { border-collapse: collapse; font-size: 14px; } table.users td, table.users th { border: 1px solid #d8dde6; padding: 4px 10px; }
+  table.preview { border-collapse: collapse; font-size: 14px; width: 100%; }
+  table.preview td, table.preview th { border: 1px solid #d8dde6; padding: 5px 8px; vertical-align: top; text-align: left; }
+  table.preview input[type=text], table.preview input[type=email] { width: 150px; padding: 5px 6px; font-size: 13.5px; margin-top: 4px; }
+  table.preview .ab { font-size: 15.5px; }
+  tr.exact td { background: #fdf3e3; }
   .hidden { display: none; }
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>A=B Database <span class="badge">PROTOTYPE</span></h1>
-<p class="note">This prototype follows the A=B database concept in <b>indexdatabase / sandbox / sandbox.md</b>. Saving is <b>simulated in this browser only</b> (localStorage) — nothing is written to GitHub yet. The starting data is the seed data in the repo files <b>A.json</b>, <b>Email.json</b>, <b>SubmitDate.json</b> and <b>Rating.json</b>. Use “Reset to seed data” at the bottom to start over.</p>
+<p class="note">This prototype follows the A=B database concept in <b>indexdatabase / sandbox / sandbox.md</b>. Saving is <b>simulated in this browser only</b> (localStorage) — nothing is written to GitHub yet. The starting data is the seed data in the repo files <b>A.json</b>, <b>Email.json</b>, <b>SubmitDate.json</b> and <b>Rating.json</b>. Use “Start over” to reset the prototype to the seed data.</p>
 
 <h2>1. Submit an A=B record</h2>
 <div class="card">
@@ -54,7 +59,6 @@
     <div><label for="ft4">tag4</label><input type="text" id="ft4" placeholder="e.g. 字典"></div>
     <div><label for="ft5">tag5</label><input type="text" id="ft5" placeholder="e.g. noun"></div>
   </div>
-  <div class="msg" id="dupCheck" style="display:none"></div>
 
   <label for="fEmail">Your email</label>
   <input type="email" id="fEmail" placeholder="e.g. jdoe@email.com">
@@ -72,17 +76,21 @@
   <br>
   <button id="submitBtn" type="button">Submit A=B record</button>
   <div class="msg" id="submitMsg"></div>
+  <div id="previewBox" class="hidden">
+    <h3 id="previewTitle" style="margin:16px 0 6px"></h3>
+    <div id="preview"></div>
+    <button id="confirmBtn" type="button">Do you still want to submit your A=B to A.json database?</button>
+    <button id="startOverBtn" type="button" class="gray">Start over</button>
+    <div class="msg" id="previewMsg"></div>
+  </div>
 </div>
 
-<h2>2. Records &amp; ratings</h2>
-<div id="records"></div>
-
-<h2>3. Registered users (Email.json)</h2>
+<h2>2. Registered users (Email.json)</h2>
 <div id="users"></div>
 
-<h2>4. The four JSON files (current simulated state)</h2>
+<h2>3. The four JSON files (current simulated state)</h2>
 <div id="dataPanel"></div>
-<button class="gray" id="resetBtn" type="button">Reset to seed data</button>
+<button class="gray" id="resetBtn" type="button">Start over</button>
 </div>
 <script>
 const SEED = {
@@ -28162,14 +28170,13 @@ function todayStr() { const d = new Date(); const p = function (n) { return Stri
 function findUser(email) { const e = String(email || '').trim().toLowerCase(); if (!e) return null; return DB.Email.find(function (u) { return String(u.Email).toLowerCase() === e; }) || null; }
 function $(id) { return document.getElementById(id); }
 
-const recordsEl = $('records');
-const dupEl = $('dupCheck');
-const flash = document.createElement('div');
-flash.className = 'msg'; flash.id = 'recordsMsg';
-recordsEl.parentNode.insertBefore(flash, recordsEl);
+const previewBox = $('previewBox');
+const previewEl = $('preview');
+const previewTitle = $('previewTitle');
+const previewMsg = $('previewMsg');
 
 function showMsg(el, text, ok) { el.textContent = text; el.className = 'msg ' + (ok ? 'ok' : 'err'); el.style.display = 'block'; }
-function showRecordsMsg(text, ok) { showMsg(flash, text, ok); }
+function showPreviewMsg(text, ok) { showMsg(previewMsg, text, ok); }
 
 /* ---------- submit form ---------- */
 function updateEmailUI() {
@@ -28191,110 +28198,104 @@ function updateEmailUI() {
 $('fEmail').addEventListener('input', updateEmailUI);
 $('fAnon').addEventListener('change', updateEmailUI);
 
-function updateDup() {
+/* ---------- preview: existing records for the A being submitted ---------- */
+function renderPreview() {
   const a = $('fA').value.trim(), b = $('fB').value.trim();
-  if (!a && !b) { dupEl.style.display = 'none'; dupEl.innerHTML = ''; return; }
-  let html = '', isErr = false;
-  if (a && b) {
-    const pair = a + ' & ' + b, INFO = submissionInfo(), exact = [];
-    DB.A.forEach(function (rec, i) { if (abKey(rec) === pair) exact.push(i); });
-    if (exact.length) {
-      isErr = true;
-      html = 'Already submitted: "<b>' + esc(pair) + '</b>" (' + exact.length + 'x) — ' +
-        exact.map(function (i) { const s = INFO.subs[i]; return s ? 'by ' + esc(s.By) + ' on ' + esc(s['Submit date']) : ''; }).join('; ') +
-        '. You can rate the existing one below instead — or still submit yours as a competing entry.';
-    }
-  }
-  if (!html && a) {
-    const sameA = DB.A.filter(function (rec) { return rec.A === a; });
-    if (sameA.length) html = 'Note: "' + esc(a) + '" already has ' + sameA.length + (sameA.length === 1 ? ' entry' : ' entries') + ': ' +
-      sameA.map(function (rec) { return esc(rec['eq2(B)']); }).slice(0, 5).join(', ') + (sameA.length > 5 ? ', ...' : '') +
-      '. A different B is fine — one A can have several B meanings.';
-  }
-  if (!html && b) {
-    const sameB = DB.A.filter(function (rec) { return rec['eq2(B)'] === b; });
-    if (sameB.length) html = 'Note: "' + esc(b) + '" already appears as B in ' + sameB.length + (sameB.length === 1 ? ' entry' : ' entries') +
-      ' (' + sameB.map(function (rec) { return esc(rec.A); }).slice(0, 5).join(', ') + ').';
-  }
-  dupEl.className = 'msg ' + (isErr ? 'err' : 'ok');
-  dupEl.innerHTML = html;
-  dupEl.style.display = html ? 'block' : 'none';
-}
-$('fA').addEventListener('input', updateDup);
-$('fB').addEventListener('input', updateDup);
-
-$('submitBtn').addEventListener('click', function () {
-  const A = $('fA').value.trim(), B = $('fB').value.trim();
-  if (!A || !B) { showMsg($('submitMsg'), 'A and eq2(B) are required.', false); return; }
-  const rec = {"A": A, "eq2(B)": B, "tag1": $('ft1').value.trim(), "tag2": $('ft2').value.trim(), "tag3": $('ft3').value.trim(), "tag4": $('ft4').value.trim(), "tag5": $('ft5').value.trim()};
-  let by = 'anonymous', registered = false;
-  if (!$('fAnon').checked) {
-    const email = $('fEmail').value.trim();
-    if (!email || email.indexOf('@') < 0) { showMsg($('submitMsg'), 'A valid email is required, or check "Submit as anonymous".', false); return; }
-    by = email;
-    if (!findUser(email)) {
-      const un = $('fUser').value.trim(), fn = $('fFirst').value.trim(), ln = $('fLast').value.trim();
-      if (!un || !fn || !ln) { showMsg($('submitMsg'), 'New email: fill in Username, First name and Last name to register, or submit as anonymous.', false); return; }
-      DB.Email.push({"Email": email, "Username": un, "First name": fn, "Last name": ln});
-      registered = true;
-    }
-  }
-  DB.A.push(rec);
-  DB.SubmitDate.push({"Submit date": todayStr(), "By": by, "AB": abKey(rec)});
-  save(); renderAll();
-  ['fA', 'fB', 'ft1', 'ft2', 'ft3', 'ft4', 'ft5'].forEach(function (id) { $(id).value = ''; });
-  updateEmailUI();
-  showMsg($('submitMsg'), 'Saved (simulated): "' + abKey(rec) + '" added to A.json and SubmitDate.json' + (registered ? ', and ' + by + ' registered in Email.json' : '') + ' (By = ' + by + ').', true);
-});
-
-/* ---------- records & ratings ---------- */
-function rateClass(r) { return r < 0 ? 'rneg' : (r > 0 ? 'rpos' : 'rzero'); }
-function renderRecords() {
-  if (!DB.A.length) { recordsEl.innerHTML = '<p class="meta">No AB records yet.</p>'; return; }
+  if (!a && !b) { previewBox.classList.add('hidden'); previewEl.innerHTML = ''; previewTitle.textContent = ''; return; }
   const INFO = submissionInfo();
-  recordsEl.innerHTML = (DB.A.length > 300 ? '<p class="meta">Showing the first 300 of ' + DB.A.length + ' records — the full set is in section 4 below.</p>' : '') + DB.A.slice(0, 300).map(function (rec, i) {
-    const key = INFO.keys[i];
-    const sub = INFO.subs[i];
+  let matches = [];
+  if (a) {
+    DB.A.forEach(function (rec, i) { if (rec.A === a) matches.push(i); });
+    if (!matches.length) DB.A.forEach(function (rec, i) { if (rec.A.indexOf(a) === 0) matches.push(i); });
+  } else {
+    DB.A.forEach(function (rec, i) { if (rec['eq2(B)'] === b) matches.push(i); });
+  }
+  previewBox.classList.remove('hidden');
+  if (!matches.length) {
+    previewTitle.textContent = 'Existing records in A.json';
+    previewEl.innerHTML = '<p class="meta">No existing A=B for "' + esc(a || b) + '" yet — yours can be the first entry.</p>';
+    return;
+  }
+  const shown = matches.slice(0, 50);
+  previewTitle.textContent = 'Existing records for "' + (a || b) + '" — ' + matches.length + ' found' + (matches.length > shown.length ? ' (showing the first ' + shown.length + ')' : '');
+  const rows = shown.map(function (i) {
+    const rec = DB.A[i], key = INFO.keys[i], sub = INFO.subs[i];
     const rats = DB.Rating.filter(function (r) { return r.AB === key; });
-    const score = rats.reduce(function (a, r) { return a + Number(r.Rating || 0); }, 0);
-    const tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'].map(function (t) { return rec[t]; }).filter(Boolean).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('');
-    const subHtml = sub ? '<div class="meta">Submitted by ' + esc(sub.By) + ' on ' + esc(sub['Submit date']) + '</div><div class="meta">Submission key: ' + esc(key) + '</div>' : '<div class="meta">No submission record for this AB.</div>';
+    const score = rats.reduce(function (s, r) { return s + Number(r.Rating || 0); }, 0);
+    const exact = !!(a && b && rec.A === a && rec['eq2(B)'] === b);
+    const tags = ['tag1', 'tag2', 'tag3', 'tag4', 'tag5'].map(function (t) { return rec[t]; }).filter(Boolean).map(esc).join(' · ');
     const ratHtml = rats.length ? rats.map(function (r) {
       return '<div class="ratingline"><span class="rate ' + rateClass(Number(r.Rating)) + '">' + esc(r.Rating) + '</span>by ' + esc(r.By) + (r['Note for the AB'] ? ' — ' + esc(r['Note for the AB']) : '') + '</div>';
-    }).join('') : '<div class="ratingline meta">No ratings yet.</div>';
-    return '<div class="card">'
-      + '<div class="ab">' + esc(rec.A) + ' = ' + esc(rec['eq2(B)']) + '</div>'
-      + (tags ? '<div class="tags">' + tags + '</div>' : '')
-      + subHtml
-      + '<div class="meta"><span class="score">Score: ' + (score > 0 ? '+' : '') + score + '</span> from ' + rats.length + ' rating' + (rats.length === 1 ? '' : 's') + ' (Rating.json)</div>'
-      + ratHtml
-      + '<div class="rateform">'
-      + '<label>Your email (leave empty = anonymous)</label><input type="text" class="rateEmail" placeholder="e.g. jroe@mail.net">'
-      + '<div class="radios">'
+    }).join('') : '';
+    return '<tr class="rec' + (exact ? ' exact' : '') + '">'
+      + '<td class="ab">' + esc(rec.A) + '</td>'
+      + '<td class="ab">' + esc(rec['eq2(B)']) + (exact ? ' <span class="badge">exact match</span>' : '') + '</td>'
+      + '<td>' + tags + '</td>'
+      + '<td>' + (sub ? esc(sub.By) + '<br>' + esc(sub['Submit date']) : '—') + '</td>'
+      + '<td><span class="score">Score: ' + (score > 0 ? '+' : '') + score + '</span> <span class="meta">from ' + rats.length + ' rating' + (rats.length === 1 ? '' : 's') + '</span>' + ratHtml + '</td>'
+      + '<td><div class="radios">'
       + '<label><input type="radio" name="rating_' + i + '" value="-1"> −1 Wrong</label>'
       + '<label><input type="radio" name="rating_' + i + '" value="0" checked> 0 No comment</label>'
       + '<label><input type="radio" name="rating_' + i + '" value="1"> +1 Correct</label>'
       + '</div>'
-      + '<label>Note for the AB (required for −1)</label><input type="text" class="rateNote" placeholder="e.g. A is not equal to B, please correct it. Thank you.">'
-      + '<br><button type="button" class="small rateBtn" data-idx="' + i + '">Rate this A=B</button>'
-      + '</div></div>';
+      + '<input type="email" class="rateEmail" placeholder="Your email (optional)">'
+      + '<input type="text" class="rateNote" placeholder="Note for the AB (required for −1)">'
+      + '<br><button type="button" class="small rateBtn" data-idx="' + i + '">Rate this A=B</button></td></tr>';
   }).join('');
+  previewEl.innerHTML = '<table class="preview"><tr><th>A</th><th>eq2(B)</th><th>Tags</th><th>Submitted by</th><th>Score &amp; ratings</th><th>Rate it</th></tr>' + rows + '</table>';
 }
-recordsEl.addEventListener('click', function (e) {
+$('fA').addEventListener('input', renderPreview);
+$('fB').addEventListener('input', renderPreview);
+
+function readSubmission() {
+  const A = $('fA').value.trim(), B = $('fB').value.trim();
+  if (!A || !B) { showMsg($('submitMsg'), 'A and eq2(B) are required.', false); return null; }
+  const rec = {"A": A, "eq2(B)": B, "tag1": $('ft1').value.trim(), "tag2": $('ft2').value.trim(), "tag3": $('ft3').value.trim(), "tag4": $('ft4').value.trim(), "tag5": $('ft5').value.trim()};
+  if ($('fAnon').checked) return {rec: rec, by: 'anonymous', newUser: null};
+  const email = $('fEmail').value.trim();
+  if (!email || email.indexOf('@') < 0) { showMsg($('submitMsg'), 'A valid email is required, or check "Submit as anonymous".', false); return null; }
+  if (findUser(email)) return {rec: rec, by: email, newUser: null};
+  const un = $('fUser').value.trim(), fn = $('fFirst').value.trim(), ln = $('fLast').value.trim();
+  if (!un || !fn || !ln) { showMsg($('submitMsg'), 'New email: fill in Username, First name and Last name to register, or submit as anonymous.', false); return null; }
+  return {rec: rec, by: email, newUser: {"Email": email, "Username": un, "First name": fn, "Last name": ln}};
+}
+$('submitBtn').addEventListener('click', function () {
+  if (!readSubmission()) return;
+  previewBox.classList.remove('hidden');
+  renderPreview();
+  showMsg($('submitMsg'), 'Preview: the table below lists the A=B records already in A.json for your A. You can rate an existing one in its row — or confirm with the button under the table to add yours.', true);
+  if (previewBox.scrollIntoView) previewBox.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+});
+$('confirmBtn').addEventListener('click', function () {
+  const s = readSubmission();
+  if (!s) return;
+  if (s.newUser) DB.Email.push(s.newUser);
+  DB.A.push(s.rec);
+  DB.SubmitDate.push({"Submit date": todayStr(), "By": s.by, "AB": abKey(s.rec)});
+  save();
+  ['fA', 'fB', 'ft1', 'ft2', 'ft3', 'ft4', 'ft5'].forEach(function (id) { $(id).value = ''; });
+  renderAll(); updateEmailUI();
+  showMsg($('submitMsg'), 'Saved (simulated): "' + abKey(s.rec) + '" added to A.json and SubmitDate.json' + (s.newUser ? ', and ' + s.by + ' registered in Email.json' : '') + ' (By = ' + s.by + ').', true);
+});
+
+/* ---------- records & ratings ---------- */
+function rateClass(r) { return r < 0 ? 'rneg' : (r > 0 ? 'rpos' : 'rzero'); }
+
+previewEl.addEventListener('click', function (e) {
   const btn = e.target.closest('.rateBtn');
   if (!btn) return;
   const i = Number(btn.getAttribute('data-idx'));
   const rec = DB.A[i]; if (!rec) return;
-  const card = btn.closest('.card');
+  const card = btn.closest('.rec');
   const sel = card.querySelector('input[name="rating_' + i + '"]:checked');
   const rating = sel ? Number(sel.value) : 0;
   const note = card.querySelector('.rateNote').value.trim();
   let by = card.querySelector('.rateEmail').value.trim();
   if (!by) by = 'anonymous';
-  if (rating === -1 && !note) { showRecordsMsg('Rating −1 (Wrong) needs a correcting note in "Note for the AB".', false); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+  if (rating === -1 && !note) { showPreviewMsg('Rating −1 (Wrong) needs a correcting note in "Note for the AB".', false); return; }
   DB.Rating.push({"Rating": rating, "AB": submissionInfo().keys[i], "By": by, "Note for the AB": note});
   save(); renderAll();
-  showRecordsMsg('Saved (simulated): rating ' + rating + ' for submission "' + submissionInfo().keys[i] + '" added to Rating.json (By = ' + by + ').', true);
+  showPreviewMsg('Saved (simulated): rating ' + rating + ' for submission "' + submissionInfo().keys[i] + '" added to Rating.json (By = ' + by + ').', true);
 });
 
 /* ---------- users & data panel ---------- */
@@ -28321,13 +28322,16 @@ $('dataPanel').addEventListener('click', function (e) {
   a.click();
   setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
 });
-$('resetBtn').addEventListener('click', function () {
+function startOver() {
   try { localStorage.removeItem(LS_KEY); } catch (e) {}
   DB = JSON.parse(JSON.stringify(SEED));
+  ['fA', 'fB', 'ft1', 'ft2', 'ft3', 'ft4', 'ft5'].forEach(function (id) { $(id).value = ''; });
   renderAll(); updateEmailUI();
-  showMsg($('submitMsg'), 'Prototype data reset to the seed data from the repo JSON files.', true);
-});
-function renderAll() { renderRecords(); renderUsers(); renderData(); updateDup(); }
+  showMsg($('submitMsg'), 'Started over: prototype data is back to the seed data from the repo JSON files.', true);
+}
+$('resetBtn').addEventListener('click', startOver);
+$('startOverBtn').addEventListener('click', startOver);
+function renderAll() { renderUsers(); renderData(); renderPreview(); }
 updateEmailUI();
 renderAll();
 </script>
