@@ -78,7 +78,7 @@ A.json 檔案設計為初始為空，並由使用者群體共同建構－全球�
 ## Free tier SQL DB host service
 
 | Service         | Database Engine              | Free Storage                   | Key Limit           | Always-On            | Best For                                                              |
-|   - - - - - -   |   - - - - - - - - - - - -    |   - - - - - - - - - - - - - -  |   - - - - - - - -   |   - - - - - - - -    |   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   |
+|-----------------|------------------------------|--------------------------------|---------------------|----------------------|-----------------------------------------------------------------------|
 | **Supabase**    | PostgreSQL                   | 500 MB DB + 1 GB File          | 50k MAUs            | Pauses after 7 days  | Full-stack apps needing auth, storage, and realtime                   |
 | **Neon**        | PostgreSQL                   | 0.5 GB                         | 190 compute hrs/mo  | Cold starts (~500ms) | Developers who want serverless Postgres and git-like branching        |
 | **Turso**       | libSQL (SQLite)              | 9 GB                           | 1B row reads/mo     | Yes                  | Read-heavy, globally distributed apps needing low latency             |
