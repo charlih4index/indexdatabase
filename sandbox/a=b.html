@@ -41,12 +41,17 @@
   table.preview .ab { font-size: 15.5px; }
   tr.exact td { background: #fdf3e3; }
   .hidden { display: none; }
+  button.big { background: #137333; font-size: 16.5px; padding: 12px 22px; }
+  button.big:hover { background: #0e5c27; }
+  button:disabled { opacity: .55; cursor: default; }
+  .flash { animation: pvflash 1.1s ease-out; }
+  @keyframes pvflash { 0% { box-shadow: 0 0 0 3px #f0d48a; } 100% { box-shadow: 0 0 0 0 rgba(240,212,138,0); } }
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1>A=B Database <span class="badge">PROTOTYPE</span></h1>
-<p class="note">This page follows the A=B database concept in <b>indexdatabase / sandbox / sandbox.md</b>. Saving is <b>real</b>: submissions and ratings are stored in the <b>TiDB Cloud</b> database and shared with every visitor. Submitting is two steps: “Submit A=B record” checks the database and shows what already exists for your A; the button under the table then saves your entry. The starting data was the seed in the repo files <b>A.json</b>, <b>Email.json</b>, <b>SubmitDate.json</b> and <b>Rating.json</b>.</p>
+<p class="note">This page follows the A=B database concept in <b>indexdatabase / sandbox / sandbox.md</b>. Saving is <b>real</b>: submissions and ratings are stored in the <b>TiDB Cloud</b> database and shared with every visitor. Submitting is two steps: <b>“Check existing entries”</b> shows what already exists for your A; the green button under the table then saves your entry. The starting data was the seed in the repo files <b>A.json</b>, <b>Email.json</b>, <b>SubmitDate.json</b> and <b>Rating.json</b>.</p>
 
 <h2>1. Submit an A=B record</h2>
 <div class="card">
@@ -74,12 +79,13 @@
 
   <label style="font-weight:400"><input type="checkbox" id="fAnon"> Submit as anonymous (no email recorded)</label>
   <br>
-  <button id="submitBtn" type="button">Submit A=B record</button>
+  <button id="submitBtn" type="button">Check existing entries</button>
   <div class="msg" id="submitMsg"></div>
   <div id="previewBox" class="hidden">
+    <p id="staleWarn" class="note hidden" style="border-color:#b3261e;margin:10px 0"></p>
     <h3 id="previewTitle" style="margin:16px 0 6px"></h3>
     <div id="preview"></div>
-    <button id="confirmBtn" type="button">Click the button to contribute your A=B definition to database</button>
+    <button id="confirmBtn" type="button" class="big">Click the button to contribute your A=B definition to database</button>
     <button id="startOverBtn" type="button" class="gray">Start over</button>
     <div class="msg" id="previewMsg"></div>
   </div>
@@ -155,6 +161,33 @@ let displayRows = [];   // all rows returned by the last lookup (exact + prefix)
 let shownRows = [];     // rows actually shown (exact only, when any exact exist)
 let lookupSeq = 0;
 let userCache = { email: null, user: undefined };  // user: undefined = unknown, null = not registered
+let previewFor = { a: '', b: '' };   // the A/B values the shown table was loaded for
+let checkedOK = false;               // the form passed validation via the Check button
+
+/* ----- Anti-foolproofing helpers ----- */
+function scrollToEl(el) { try { el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) { /* older browsers */ } }
+function syncCheckBtn() {
+  $('submitBtn').disabled = checkedOK;
+  $('submitBtn').textContent = checkedOK ? '✓ Checked — confirm below ↓' : 'Check existing entries';
+}
+function isStale() {
+  if ($('previewBox').classList.contains('hidden')) return false;
+  const a = $('fA').value.trim();
+  if (!a) return false;
+  return a !== previewFor.a || $('fB').value.trim() !== previewFor.b;
+}
+function updateStaleBanner() {
+  const w = $('staleWarn');
+  if (!w) return;
+  if (isStale()) {
+    w.textContent = '⚠ You changed A or B — this table was loaded for A = "' + previewFor.a + '" and may not match your current input. The save button will refresh the table first.';
+    w.classList.remove('hidden');
+  } else w.classList.add('hidden');
+}
+function onFormEdit() {
+  if (checkedOK) { checkedOK = false; syncCheckBtn(); }
+  updateStaleBanner();
+}
 
 /* ----- Registration status next to the email field ----- */
 let emailSeq = 0;
@@ -254,7 +287,7 @@ function renderPreview(a) {
       + '<td>' + ratingsHtml + '</td>'
       + '<td><div class="rateform"><div class="radios">'
       + '<label><input type="radio" name="rating_' + i + '" value="-1"> −1 Wrong</label>'
-      + '<label><input type="radio" name="rating_' + i + '" value="0" checked> 0 No comment</label>'
+      + '<label><input type="radio" name="rating_' + i + '" value="0"> 0 No comment</label>'
       + '<label><input type="radio" name="rating_' + i + '" value="1"> +1 Correct</label></div>'
       + '<input type="email" id="rate-email_' + i + '" placeholder="Your email (optional)">'
       + '<input type="text" id="rate-note_' + i + '" placeholder="Note for the AB">'
@@ -266,13 +299,16 @@ function renderPreview(a) {
 }
 async function refreshPreview() {
   const a = $('fA').value.trim();
-  if (!a) { displayRows = []; renderPreview(''); return; }
+  const b = $('fB').value.trim();
+  if (!a) { displayRows = []; previewFor = { a: '', b: '' }; renderPreview(''); updateStaleBanner(); return; }
   const seq = ++lookupSeq;
   try {
     const rows = await lookup(a);
     if (seq !== lookupSeq) return;
     displayRows = rows;
+    previewFor = { a: a, b: b };
     renderPreview(a);
+    updateStaleBanner();
   } catch (e) {
     if (seq !== lookupSeq) return;
     $('previewBox').classList.remove('hidden');
@@ -287,18 +323,31 @@ function schedulePreview() { clearTimeout(previewTimer); previewTimer = setTimeo
 $('submitBtn').addEventListener('click', async () => {
   hideMsg($('previewMsg'));
   const s = await readSubmitter();
-  if (!s) return;
+  if (!s) { scrollToEl($('submitMsg')); return; }
   hideMsg($('submitMsg'));
   await refreshPreview();
+  checkedOK = true; syncCheckBtn();
   showMsg($('previewMsg'), 'Check the table — if your A=B is already there, you can rate it instead. Otherwise use the button below the table to save yours.', true);
+  scrollToEl($('previewBox'));
+  const box = $('previewBox');
+  box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+  setTimeout(() => box.classList.remove('flash'), 1200);
 });
 
 /* ----- Confirm (step 2: actually write to TiDB) ----- */
 $('confirmBtn').addEventListener('click', async () => {
   const s = await readSubmitter();
-  if (!s) { $('previewBox').classList.remove('hidden'); showMsg($('previewMsg'), 'Please fix the problem above first.', false); return; }
+  if (!s) { $('previewBox').classList.remove('hidden'); showMsg($('previewMsg'), 'Please fix the problem above first.', false); scrollToEl($('submitMsg')); return; }
+  if (isStale()) {
+    await refreshPreview();
+    showMsg($('previewMsg'), 'Table updated for your current A/B — please check it, then click the button again to save your A=B.', true);
+    scrollToEl($('previewBox'));
+    return;
+  }
   const btn = $('confirmBtn');
-  btn.disabled = true;
+  const btnText = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  $('submitBtn').disabled = true; $('startOverBtn').disabled = true; $('resetBtn').disabled = true;
   try {
     if (s.newUser) {
       await api('/register', { method: 'POST', body: s.newUser });
@@ -319,11 +368,18 @@ $('confirmBtn').addEventListener('click', async () => {
     } catch (e) { /* keep the computed key */ }
     ['fA', 'fB', 'ft1', 'ft2', 'ft3', 'ft4', 'ft5'].forEach(id => { $(id).value = ''; });
     displayRows = [];
+    previewFor = { a: '', b: '' };
     renderPreview('');
+    checkedOK = false;
     showMsg($('submitMsg'), 'Saved: "' + key + '" added to the TiDB database' + (s.newUser ? ', and ' + s.by + ' registered as a user' : '') + '.', true);
+    scrollToEl($('submitMsg'));
   } catch (e) {
     showMsg($('previewMsg'), 'Saving failed (' + e.message + '). Nothing was written — please try again.', false);
-  } finally { btn.disabled = false; }
+  } finally {
+    btn.disabled = false; btn.textContent = btnText;
+    $('startOverBtn').disabled = false; $('resetBtn').disabled = false;
+    syncCheckBtn();
+  }
 });
 
 /* ----- Rating from a preview row ----- */
@@ -335,12 +391,13 @@ $('preview').addEventListener('click', async (ev) => {
   if (!r) return;
   const msgEl = $('rateMsg_' + i);
   const checked = document.querySelector('input[name="rating_' + i + '"]:checked');
-  const rating = checked ? Number(checked.value) : 0;
+  if (!checked) { showMsg(msgEl, 'Choose −1, 0 or +1 first.', false); return; }
+  const rating = Number(checked.value);
   let by = $('rate-email_' + i).value.trim();
   const note = $('rate-note_' + i).value.trim();
   if (by && by.indexOf('@') < 1) { showMsg(msgEl, 'Please enter a valid email, or leave it empty to rate as anonymous.', false); return; }
   if (!by) by = 'anonymous';
-  if (rating === -1 && !note) { showMsg(msgEl, 'A rating of −1 (Wrong) needs a note — please write in "Note for the AB" how it should be corrected.', false); return; }
+  if (rating === -1 && !note) { showMsg(msgEl, 'A rating of −1 (Wrong) needs a note — please write in "Note for the AB" how it should be corrected.', false); $('rate-note_' + i).focus(); return; }
   btn.disabled = true;
   try {
     try { await api('/rate', { method: 'POST', body: { submission_key: r.submission_key, rating: rating, by: by, note: note } }); }
@@ -354,9 +411,13 @@ $('preview').addEventListener('click', async (ev) => {
 
 /* ----- Start over (clears the form; saved records are unaffected) ----- */
 function startOver() {
+  const dirty = ['fA', 'fB', 'ft1', 'ft2', 'ft3', 'ft4', 'ft5', 'fEmail', 'fUser', 'fFirst', 'fLast'].some(id => $(id).value.trim() !== '') || $('fAnon').checked;
+  if (dirty && !window.confirm('Clear the form? Your typed input will be lost.')) return;
   ['fA', 'fB', 'ft1', 'ft2', 'ft3', 'ft4', 'ft5', 'fEmail', 'fUser', 'fFirst', 'fLast'].forEach(id => { $(id).value = ''; });
   $('fAnon').checked = false;
   userCache = { email: null, user: undefined };
+  checkedOK = false; syncCheckBtn();
+  previewFor = { a: '', b: '' };
   hideMsg($('previewMsg'));
   displayRows = [];
   renderPreview('');
@@ -412,6 +473,9 @@ $('fEmail').addEventListener('input', () => { clearTimeout(emailTimer); emailTim
 $('fAnon').addEventListener('change', updateEmailUI);
 $('fA').addEventListener('input', schedulePreview);
 $('fB').addEventListener('input', schedulePreview);
+['fA', 'fB', 'ft1', 'ft2', 'ft3', 'ft4', 'ft5', 'fUser', 'fFirst', 'fLast'].forEach(id => { $(id).addEventListener('input', onFormEdit); });
+$('fEmail').addEventListener('input', onFormEdit);
+$('fAnon').addEventListener('change', onFormEdit);
 
 try { localStorage.removeItem('abdb_proto_v3'); } catch (e) { /* the old simulated data is obsolete */ }
 if (!KEYS_READY) {
