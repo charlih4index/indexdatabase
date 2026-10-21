@@ -81,6 +81,6 @@ A.json 檔案設計為初始為空，並由使用者群體共同建構－全球�
 |-----------------|------------------------------|--------------------------------|---------------------|----------------------|-----------------------------------------------------------------------|
 |**Supabase**    |PostgreSQL                         |500 MB DB + 1 GB File          |50k MAUs            |Pauses after 7 days  |Full-stack apps needing auth, storage, and realtime                   |
 |**Neon**        |PostgreSQL                         |0.5 GB                         |190 compute hrs/mo  |Cold starts (~500ms) |Developers who want serverless Postgres and git-like branching        |
-|[**Turso**](https://turso.tech/) | libSQL (SQLite)  |9 GB                           |1B row reads/mo     |Yes                  |Read-heavy, globally distributed apps needing low latency             |
+|[**Turso**](https://turso.tech/) | libSQL (SQLite)  |5 GB                           |1B row reads/mo     |Yes                  |Read-heavy, globally distributed apps needing low latency             |
 |**CockroachDB** |PostgreSQL (wire-compatible)       |10 GiB                         |50M Request Units   |Scales to zero       |Apps that need enterprise-grade resilience and horizontal scale       |
-|**TiDB Cloud**  |MySQL (compatible)                 |5 GiB (row) + 5 GiB (columnar) |50M RUs, 5 clusters |Yes                  |Data-intensive apps needing real-time analytics on transactional data |
+|[**TiDB Cloud**](https://www.pingcap.com/pricing/)  |MySQL (compatible)             |25 GiB (row) + 25 GiB (columnar) |50M RUs, 5 clusters |Yes    |Data-intensive apps needing real-time analytics on transactional data |
