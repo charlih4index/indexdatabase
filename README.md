@@ -7,10 +7,10 @@ Structured JSON databases migrated from indexbox/chinese/ placeholder .md files 
 
 ## JSON Relationship type
 
-| Type | Description |
-|------|-------------|
-| One-to-One | A single object is linked to another single object. |
-| One-to-Many | 	A single object can be linked to multiple objects. |
+| Type | Description | Abbriviation | Eaxmple |
+|------|-------------|--------------|---------|
+| One-to-One | A single object is linked to another single object. | O2O | name to Alice |
+| One-to-Many | A single object can be linked to multiple objects. | O2M | 1 author_name to 2 titles |
 
 ### O2O
 
