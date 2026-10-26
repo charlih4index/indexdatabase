@@ -45,10 +45,10 @@
 
 ---
 
-## Alphabet vs Writing
+## Alphabet(Pronunciation) vs Writing
 
-### 五十音 (46 alphabet)
+### Pronunciation system: 五十音 (46 alphabet)
 
-### writing system
+### Writing system:
 
 Hiragana (平假名), Katakana (片假名), Kanji (漢字)
