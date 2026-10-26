@@ -35,7 +35,7 @@
 - Hiragana (ひらがな) → 平假名
 	-- Used for native Japanese words and grammar.
 - Katakana (カタカナ) → 片假名
-	-- Used mainly for foreign words, loanwords, and emphasis.
+	-- Used mainly for foreign words(外來語), loanwords(外來語), and emphasis(強調語氣).
 - Romaji → 羅馬字
 	-- Japanese sounds written with the Latin alphabet (e.g., "arigatou").
 - Kanji → 漢字
@@ -47,3 +47,8 @@
 
 ## Alphabet vs Writing
 
+### 五十音 (46 alphabet)
+
+### writing system
+
+Hiragana (平假名), Katakana (片假名), Kanji (漢字)
