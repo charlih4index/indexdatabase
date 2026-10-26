@@ -49,6 +49,10 @@
 
 ### Pronunciation system: 五十音 (46 alphabet)
 
+1. "blank" : Seion (清音)
+2. " : Dakuon (濁音)
+3. o : Handakuon (半濁音)
+
 ### Writing system:
 
 Hiragana (平假名), Katakana (片假名), Kanji (漢字)
