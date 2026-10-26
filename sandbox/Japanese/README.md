@@ -50,8 +50,9 @@
 ### Pronunciation system: 五十音 (46 alphabet)
 
 1. "blank" : Seion (清音)
-2. " : Dakuon (濁音)
+2. " : Dakuon (濁音) or (長音) ???
 3. o : Handakuon (半濁音)
+4. . : (拗音)
 
 ### Writing system:
 
