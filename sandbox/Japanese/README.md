@@ -32,12 +32,18 @@
 - Handakuon (半濁音) → 半濁音
 	-- Semi-voiced sounds marked with ゜.
 	-- Example: ぱ (pa), ぴ (pi), ぷ (pu)
-- Katakana (カタカナ) → 片假名
-	-- Used mainly for foreign words, loanwords, and emphasis.
 - Hiragana (ひらがな) → 平假名
 	-- Used for native Japanese words and grammar.
+- Katakana (カタカナ) → 片假名
+	-- Used mainly for foreign words, loanwords, and emphasis.
 - Romaji → 羅馬字
 	-- Japanese sounds written with the Latin alphabet (e.g., "arigatou").
-
+- Kanji → 漢字
+	-- Japanese written borrowed from the Chinese character (e.g., "比例" AKA. "ひれい" AKA. "proportion").
+  
 <img width="302" height="300" alt="image" src="https://github.com/user-attachments/assets/b7c8605f-c951-4942-8c39-20f6d021ac24" />
+
+---
+
+## Alphabet vs Writing
 
